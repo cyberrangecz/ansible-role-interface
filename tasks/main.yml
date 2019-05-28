@@ -1,0 +1,16 @@
+
+- name: check existence of required variables
+  fail:
+      msg: required variable '{{ item.key }}' is undefined
+  when: item.value is undefined or not item.value
+  with_dict: '{{ interface_required_variables }}' 
+
+- include: main-interface.yml
+  loop_control:
+      loop_var: interface_interface
+  vars:
+      interface_default_gateway: '{{ interface_interface.interface_default_gateway | default() }}'
+      interface_routes: '{{ interface_interface.interface_routes | default([]) }}'
+      interface_mac: '{{ interface_interface.interface_mac | default() }}'
+  with_items: '{{ interface_interfaces }}'
+

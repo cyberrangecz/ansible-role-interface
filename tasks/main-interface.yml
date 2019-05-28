@@ -1,0 +1,15 @@
+
+- name: check existence of required variables
+  fail:
+      msg: interface_mac is not defined
+  when: not interface_mac
+
+- set_fact:
+      interface_device: '{%- from "templates/network.j2" import mac_to_interface with context -%}
+                         {{ mac_to_interface(interface_mac) | default("") }}'
+
+- include: clean.yml
+  when: interface_clean is defined and interface_clean
+
+- include: interface.yml
+

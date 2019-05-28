@@ -1,0 +1,17 @@
+
+interface_default_file: /etc/network/interfaces
+interface_directory: '{{ interface_default_file }}.d'
+interface_file_name:
+interface_file: '{% if interface_file_name is defined and interface_file_name %}{{ interface_directory }}/{{ interface_file_name }}{% else %}{{ interface_default_file }}{% endif %}'
+
+interface_clean: True
+interface_mtu: 1442
+
+interface_interfaces: []
+#  - interface_default_gateway:
+#    interface_routes: []
+#    interface_mac:
+
+interface_required_variables:
+    interface_interfaces: '{{ interface_interfaces }}'
+
