@@ -1,4 +1,4 @@
-# Ansible role - Interface - BETA (only for Ansible 2.3.3.0)
+# Ansible role - Interface (only for Ansible 2.3.3.0)
 
 This role serves for network interface configuration on debian-based systems.
 
@@ -19,22 +19,22 @@ This role serves for network interface configuration on debian-based systems.
 Mandatory parameters.
 
 * `interface_interfaces` - The list of network interface parameters. Each interface may consists of following attributes.
-    * `interface_mac` (mandatory) - .    
-    * `interface_default_gateway` (optional) - .
+    * `interface_mac` (mandatory) - The MAC address of interface to configure.    
+    * `interface_default_gateway` (optional) - The IPv4 address of default gateway.
     * `interface_routes` (optional) - The list of route parameters. Each route must consist of following attributes.
-        * `gateway` (mandatory) - .
-        * `network` (mandatory) - .
-        * `mask` (mandatory) - .
+        * `gateway` (mandatory) - The IPv4 address of default gateway for this route.
+        * `network` (mandatory) - The IP address of network from which pakets will be routed.
+        * `mask` (mandatory) - The subnet mask in address format or prefix number.
 
 Optional parameters.
 
-* `interface_clean` - .
-* `interface_mtu` - .
-* `interface_file_name` - .
+* `interface_clean` - Boolean value (**True**/**False**) that means whether to clean all interface configuration before applying role or not.
+* `interface_mtu` - The number of maximum transmission unit.
+* `interface_file_name` - The file name for your configuration located in `/etc/network/interfaces.d/` directory.
 
 ## Example
 
-Example of the simplest network interface configuration that 
+Example of the simplest network interface configuration that just set MTU of specified interface.
 
 ```yml
 roles:
