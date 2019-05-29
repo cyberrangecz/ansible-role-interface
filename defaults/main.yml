@@ -2,7 +2,12 @@
 interface_default_file: /etc/network/interfaces
 interface_directory: '{{ interface_default_file }}.d'
 interface_file_name:
-interface_file: '{% if interface_file_name is defined and interface_file_name %}{{ interface_directory }}/{{ interface_file_name }}{% else %}{{ interface_default_file }}{% endif %}'
+interface_file: '
+    {%- if interface_file_name is defined and interface_file_name -%}
+        {{ interface_directory }}/{{ interface_file_name }}
+    {%- else -%}
+        {{ interface_default_file }}
+    {%- endif %}'
 
 interface_clean: True
 interface_mtu: 1442

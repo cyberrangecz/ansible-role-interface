@@ -5,7 +5,7 @@
   when: not interface_mac
 
 - set_fact:
-      interface_device: '{%- from "templates/network.j2" import mac_to_interface with context -%}
+      interface_device: '{%- from "roles/common/templates/network.j2" import mac_to_interface with context -%}
                          {{ mac_to_interface(interface_mac) | default("") }}'
 
 - include: clean.yml
