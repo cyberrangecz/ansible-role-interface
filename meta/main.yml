@@ -1,6 +1,5 @@
-
 dependencies:
-    - src: git@gitlab.ics.muni.cz:CSIRT-MU-public/ansible-roles/common.git
+    - src: git@git-internal-ssh:/repos/ansible-roles/common.git
       scm: git
 
 galaxy_info:
