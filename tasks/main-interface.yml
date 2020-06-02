@@ -1,15 +1,15 @@
 
 - name: check existence of required variables
   fail:
-      msg: interface_mac is not defined
-  when: not interface_mac
+      msg: kypo_interface_mac is not defined
+  when: not kypo_interface_mac
 
 - set_fact:
-      interface_device: '{%- from "roles/common/templates/network.j2" import mac_to_interface with context -%}
-                         {{ mac_to_interface(interface_mac) | default("") }}'
+      kypo_interface_device: '{%- from "roles/kypo-common/templates/network.j2" import mac_to_interface with context -%}
+                         {{ mac_to_interface(kypo_interface_mac) | default("") }}'
 
 - include: clean.yml
-  when: interface_clean is defined and interface_clean
+  when: kypo_interface_clean is defined and kypo_interface_clean
 
 - include: interface.yml
 

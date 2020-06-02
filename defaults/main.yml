@@ -1,22 +1,22 @@
 
-interface_default_file: /etc/network/interfaces
-interface_directory: '{{ interface_default_file }}.d'
-interface_file_name:
-interface_file: '
-    {%- if interface_file_name is defined and interface_file_name -%}
-        {{ interface_directory }}/{{ interface_file_name }}
+kypo_interface_default_file: /etc/network/interfaces
+kypo_interface_directory: '{{ kypo_interface_default_file }}.d'
+kypo_interface_file_name:
+kypo_interface_file: '
+    {%- if kypo_interface_file_name is defined and kypo_interface_file_name -%}
+        {{ kypo_interface_directory }}/{{ kypo_interface_file_name }}
     {%- else -%}
-        {{ interface_default_file }}
+        {{ kypo_interface_default_file }}
     {%- endif %}'
 
-interface_clean: True
-interface_mtu: 1442
+kypo_interface_clean: True
+kypo_interface_mtu: 1442
 
-interface_interfaces: []
-#  - interface_default_gateway:
-#    interface_routes: []
-#    interface_mac:
+kypo_interface_interfaces: []
+#  - kypo_interface_default_gateway:
+#    kypo_interface_routes: []
+#    kypo_interface_mac:
 
-interface_required_variables:
-    interface_interfaces: '{{ interface_interfaces }}'
+kypo_interface_required_variables:
+    kypo_interface_interfaces: '{{ kypo_interface_interfaces }}'
 

@@ -3,14 +3,14 @@
   fail:
       msg: required variable '{{ item.key }}' is undefined
   when: item.value is undefined or not item.value
-  with_dict: '{{ interface_required_variables }}' 
+  with_dict: '{{ kypo_interface_required_variables }}'
 
 - include: main-interface.yml
   loop_control:
-      loop_var: interface_interface
+      loop_var: kypo_interface_interface
   vars:
-      interface_default_gateway: '{{ interface_interface.interface_default_gateway | default() }}'
-      interface_routes: '{{ interface_interface.interface_routes | default([]) }}'
-      interface_mac: '{{ interface_interface.interface_mac | default() }}'
-  with_items: '{{ interface_interfaces }}'
+      kypo_interface_default_gateway: '{{ kypo_interface_interface.kypo_interface_default_gateway | default() }}'
+      kypo_interface_routes: '{{ kypo_interface_interface.kypo_interface_routes | default([]) }}'
+      kypo_interface_mac: '{{ kypo_interface_interface.kypo_interface_mac | default() }}'
+  with_items: '{{ kypo_interface_interfaces }}'
 
