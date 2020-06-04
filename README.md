@@ -18,30 +18,30 @@ This role serves for network interface configuration on debian-based systems.
 
 Mandatory parameters.
 
-* `interface_interfaces` - The list of network interface parameters. Each interface may consists of following attributes.
-    * `interface_mac` (mandatory) - The MAC address of interface to configure.    
-    * `interface_default_gateway` (optional) - The IPv4 address of default gateway.
-    * `interface_routes` (optional) - The list of route parameters. Each route must consist of following attributes.
+* `kypo_interface_interfaces` - The list of network interface parameters. Each interface may consists of following attributes.
+    * `kypo_interface_mac` (mandatory) - The MAC address of interface to configure.    
+    * `kypo_interface_default_gateway` (optional) - The IPv4 address of default gateway.
+    * `kypo_interface_routes` (optional) - The list of route parameters. Each route must consist of following attributes.
         * `gateway` (mandatory) - The IPv4 address of default gateway for this route.
         * `network` (mandatory) - The IP address of network from which pakets will be routed.
         * `mask` (mandatory) - The subnet mask in address format or prefix number.
 
 Optional parameters.
 
-* `interface_clean` - Boolean value (**True**/**False**) that means whether to clean all interface configuration before applying role or not.
-* `interface_mtu` - The number of maximum transmission unit.
-* `interface_file_name` - The file name for your configuration located in `/etc/network/interfaces.d/` directory.
+* `kypo_interface_clean` - Boolean value (**True**/**False**) that means whether to clean all interface configuration before applying role or not (default: True).
+* `kypo_interface_mtu` - The number of maximum transmission unit (default: 1442).
+* `kypo_interface_file_name` - The file name for your configuration located in `/etc/network/interfaces.d/` directory (by default the file `/etc/network/interface` is used).
 
 ## Example
 
-Example of the simplest network interface configuration that just set MTU of specified interface.
+Example of the simplest network interface configuration that just sets MTU of the specified interface.
 
 ```yml
 roles:
-    - role: interface
-      interface_interfaces:
-          - interface_mac: 01:23:45:67:89:ab
-            interface_mtu: 1442
+    - role: kypo-interface
+      kypo_interface_interfaces:
+          - kypo_interface_mac: 01:23:45:67:89:ab
+            kypo_interface_mtu: 1442
 ```
 
 ## Maintainer notes
