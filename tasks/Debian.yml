@@ -1,0 +1,49 @@
+
+- name: clean interfaces configuration
+  when: kypo_interface_clean is defined and kypo_interface_clean
+  block:
+   - name: find all interfaces configuration files
+     find:
+         paths:
+             - '{{ kypo_interface_directory }}'
+     register: kypo_interface_extra_files
+
+   - set_fact:
+         kypo_interface_config_files: '{{ (kypo_interface_extra_files.files | map(attribute="path") | list) + [kypo_interface_default_file] }}'
+
+   - include_tasks: 'clean-Debian.yml'
+     vars:
+       kypo_interface_device: '{{ kypo_interface_item.kypo_interface_device }}'
+     loop_control:
+       loop_var: kypo_interface_item
+     loop: '{{ kypo_interface_interfaces }}'
+
+   - name: remove multiple consecutive new line characters
+     replace:
+         path: '{{ item }}'
+         regexp: '(\n)+'
+         replace: '\n'
+     with_items: '{{ kypo_interface_config_files }}'
+
+- name: configure interfaces
+  blockinfile:
+      path: '{{ kypo_interface_file }}'
+      create: yes
+      marker: '# {mark} {{ item.kypo_interface_device }}'
+      block: |
+          allow-hotplug {{ item.kypo_interface_device }}
+          auto {{ item.kypo_interface_device }}
+          iface {{ item.kypo_interface_device }} inet dhcp
+              mtu {{ kypo_interface_mtu }}
+              {% if item.kypo_interface_default_gateway is defined and item.kypo_interface_default_gateway -%}
+              gateway {{ item.kypo_interface_default_gateway }}
+              up route add default gw {{ item.kypo_interface_default_gateway }}
+              {% endif -%}
+              {% if item.kypo_interface_routes is defined and item.kypo_interface_routes -%}
+              {% for route in item.kypo_interface_routes -%}
+              post-up ip route add {{ route['network'] }}/{{ route['mask'] }} via {{ route['gateway'] }}
+              pre-down ip route del {{ route['network'] }}/{{ route['mask'] }} via {{ route['gateway'] }}
+              {% endfor %}
+              {% endif %}
+  notify: kypo_interface_networking_restart
+  loop: '{{ kypo_interface_interfaces }}'

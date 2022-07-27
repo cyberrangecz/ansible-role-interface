@@ -20,3 +20,5 @@ kypo_interface_interfaces: []
 kypo_interface_required_variables:
     kypo_interface_interfaces: '{{ kypo_interface_interfaces }}'
 
+kypo_interface_opnsense_config_file: /conf/config.xml
+kypo_interface_opnsense_local_config_file: '/tmp/config-{{ inventory_hostname }}'

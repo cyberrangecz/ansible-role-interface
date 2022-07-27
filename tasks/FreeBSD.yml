@@ -1,0 +1,73 @@
+
+- include_tasks: check-OPNsense.yml
+
+- name: clean interfaces configuration
+  xml:
+    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    xpath: '/opnsense/interfaces/*[if and if[text()="{{ item.kypo_interface_device }}"]]'
+    state: absent
+  delegate_to: localhost
+  loop: '{{ kypo_interface_interfaces }}'
+  when: kypo_interface_clean is defined and kypo_interface_clean
+
+- name: configure interfaces
+  include_tasks: interface-FreeBSD.yml
+  vars:
+    kypo_interface_device: '{{ kypo_interface_item.kypo_interface_device }}'
+  loop_control:
+    loop_var: kypo_interface_item
+  loop: '{{ kypo_interface_interfaces }}'
+
+- name: get default gateway
+  set_fact:
+    kypo_interface_default_gateway: '{{ kypo_interface_interfaces | selectattr("kypo_interface_default_gateway", "defined") | first }}'
+
+- name: prepare variables with configuration
+  set_fact:
+    default_gateway:
+      interface: '{{ kypo_interface_default_gateway.kypo_interface_device }}'
+      gateway: '{{ kypo_interface_default_gateway.kypo_interface_default_gateway }}'
+      name: WAN
+      ipprotocol: inet
+      priority: 1
+      weight: 1
+      monitor_disable: 1
+    firewall_rule:
+      type: pass
+      interface: '{{ kypo_interface_interfaces | map(attribute="kypo_interface_device") | join(",") }}'
+      ipprotocol: inet
+      descr: Allow everything
+      direction: any
+      source/any: 1
+      destination/any: 1
+      statetype: keep state
+      quick: 1
+      floating: 'yes'
+
+- name: configure gateway
+  xml:
+    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    xpath: '/opnsense/gateways/gateway_item[name[text()="{{ default_gateway.name }}"]]/{{ item.key }}'
+    pretty_print: yes
+    value: '{{ item.value }}'
+  loop: '{{ default_gateway | dict2items }}'
+  delegate_to: localhost
+
+- name: add firewall rule
+  xml:
+    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    xpath: '/opnsense/filter/rule[descr[text()="{{ firewall_rule.descr }}"]]/{{ item.key }}'
+    pretty_print: yes
+    value: '{{ item.value }}'
+  loop: '{{ firewall_rule | dict2items }}'
+  delegate_to: localhost
+
+- name: copy the modified configuration to machine
+  copy:
+    src: '{{ kypo_interface_opnsense_local_config_file }}'
+    dest: '{{ kypo_interface_opnsense_config_file }}'
+  register: configuration_copy
+
+- name: reboot
+  reboot:
+  when: configuration_copy is changed

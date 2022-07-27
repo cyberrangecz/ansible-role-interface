@@ -1,0 +1,34 @@
+
+- name: stat OPNsense config file
+  stat:
+    path: '{{ kypo_interface_opnsense_config_file }}'
+  register: opnsense_config_stat
+
+- name: check if config file exists
+  fail:
+    msg: "/conf/config.xml not found, only OPNsense is supported out of FreeBSD systems"
+  when: not opnsense_config_stat.stat.exists
+
+- name: fetch config file
+  fetch:
+    src: '{{ kypo_interface_opnsense_config_file }}'
+    dest: '{{ kypo_interface_opnsense_local_config_file }}'
+    flat: yes
+
+- name: install lxml on controller
+  pip:
+    name: lxml
+  delegate_to: localhost
+
+- name: check config file contains opnsense xml root
+  xml:
+    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    xpath: /opnsense
+    content: attribute
+  delegate_to: localhost
+  register: opnsense_config_root
+
+- name: assert if OPNsense
+  fail:
+    msg: "Only OPNsense is supported out of FreeBSD systems"
+  when: opnsense_config_root.matches | length != 1
