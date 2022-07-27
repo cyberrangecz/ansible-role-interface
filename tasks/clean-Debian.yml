@@ -1,13 +1,4 @@
 
-- name: find all interfaces configuration files
-  find:
-      paths:
-          - '{{ kypo_interface_directory }}'
-  register: kypo_interface_extra_files
-
-- set_fact:
-      kypo_interface_config_files: '{{ (kypo_interface_extra_files.files | map(attribute="path") | list) + [kypo_interface_default_file] }}'
-
 - name: remove old iface settings for retrieved interface name
   replace:
       path: '{{ item }}'
@@ -21,11 +12,3 @@
       regexp: '^.*(?<=\s){{ kypo_interface_device }}(?=\s).*$'
   notify: kypo_interface_networking_restart
   with_items: '{{ kypo_interface_config_files }}'
-
-- name: remove multiple consecutive new line characters
-  replace:
-      path: '{{ item }}'
-      regexp: '(\n)+'
-      replace: '\n'
-  with_items: '{{ kypo_interface_config_files }}'
-
