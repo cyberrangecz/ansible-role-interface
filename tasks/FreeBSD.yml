@@ -62,6 +62,31 @@
   loop: '{{ firewall_rule | dict2items }}'
   delegate_to: localhost
 
+- name: install netaddr on controller
+  pip:
+    name: netaddr
+  delegate_to: localhost
+
+- set_fact:
+    interfaces: "{{ ansible_interfaces | select('match', '^(vtnet)[2-9]+') | list }}"
+
+- set_fact:
+    interface_configs: |-
+      [
+      {%- for interface in interfaces -%}
+        { if: {{ interface }}, settings: [{key: if, value: {{ interface }}},{key: ipaddr,value: {{ ansible_facts[interface]['ipv4'][0]['address'] }}},{key: subnet,value: {{ ('127.0.0.1/' ~ ansible_facts[interface]['ipv4'][0]['netmask']) | ipaddr('prefix') }}},{key: mtu,value: 1442},{key: enable,value: 1}]},
+      {%- endfor -%}
+      ]
+
+- name: set static addressing on user defined networks
+  xml:
+    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    xpath: '/opnsense/interfaces/{{ item.0.if }}/{{ item.1.key }}'
+    value: '{{ item.1.value }}'
+    pretty_print: yes
+  loop: "{{ interface_configs | from_yaml | subelements('settings') }}"
+  delegate_to: localhost
+
 - name: copy the modified configuration to machine
   copy:
     src: '{{ kypo_interface_opnsense_local_config_file }}'
