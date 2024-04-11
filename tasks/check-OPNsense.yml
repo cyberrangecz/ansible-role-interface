@@ -18,6 +18,7 @@
 - name: install lxml on controller
   pip:
     name: lxml
+    version: 4.9.4
   delegate_to: localhost
 
 - name: check config file contains opnsense xml root
