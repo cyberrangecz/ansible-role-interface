@@ -10,14 +10,6 @@
   loop: '{{ kypo_interface_interfaces }}'
   when: kypo_interface_clean is defined and kypo_interface_clean
 
-- name: configure interfaces
-  include_tasks: interface-FreeBSD.yml
-  vars:
-    kypo_interface_device: '{{ kypo_interface_item.kypo_interface_device }}'
-  loop_control:
-    loop_var: kypo_interface_item
-  loop: '{{ kypo_interface_interfaces }}'
-
 - name: get default gateway
   set_fact:
     kypo_interface_default_gateway: '{{ kypo_interface_interfaces | selectattr("kypo_interface_default_gateway", "defined") | first }}'
@@ -68,7 +60,7 @@
   delegate_to: localhost
 
 - set_fact:
-    interfaces: "{{ ansible_interfaces | select('match', '^(vtnet)[2-9]+') | list }}"
+    interfaces: "{{ ansible_interfaces | select('match', '^(vtnet)[0-9]+') | list }}"
 
 - set_fact:
     interface_configs: |-
@@ -78,7 +70,7 @@
       {%- endfor -%}
       ]
 
-- name: set static addressing on user defined networks
+- name: set static addressing on allnetworks
   xml:
     path: '{{ kypo_interface_opnsense_local_config_file }}'
     xpath: '/opnsense/interfaces/{{ item.0.if }}/{{ item.1.key }}'
