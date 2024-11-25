@@ -22,3 +22,5 @@ kypo_interface_required_variables:
 
 kypo_interface_opnsense_config_file: /conf/config.xml
 kypo_interface_opnsense_local_config_file: '/tmp/config-{{ inventory_hostname }}'
+
+netplan_config_file: '/etc/netplan/50-cloud-init.yaml'

@@ -1,36 +1,56 @@
+---
 
-- name: clean interfaces configuration
-  when: kypo_interface_clean is defined and kypo_interface_clean
+- name: Determine if Netplan is used
+  set_fact:
+    is_netplan: "{{ ansible_distribution == 'Ubuntu' or (ansible_distribution == 'Debian' and ansible_distribution_version is version('12', '>=')) }}"
+
+- name: Use Netplan for network configuration
+  when: is_netplan
   block:
-   - name: find all interfaces configuration files
-     find:
-         paths:
-             - '{{ kypo_interface_directory }}'
-     register: kypo_interface_extra_files
+    - name: Generate Netplan configuration
+      template:
+        src: "50-cloud-init.yaml.j2"
+        dest: "{{ netplan_config_file }}"
+      notify: Apply Netplan configuration
 
-   - set_fact:
-         kypo_interface_config_files: '{{ (kypo_interface_extra_files.files | map(attribute="path") | list) + [kypo_interface_default_file] }}'
+    - name: Apply Netplan configuration
+      command: netplan apply
 
-   - include_tasks: 'clean-Debian.yml'
-     vars:
-       kypo_interface_device: '{{ kypo_interface_item.kypo_interface_device }}'
-     loop_control:
-       loop_var: kypo_interface_item
-     loop: '{{ kypo_interface_interfaces }}'
+- name: Use legacy configuration for older Debian
+  when: not is_netplan
+  block:
+    - name: clean interfaces configuration
+      when: kypo_interface_clean is defined and kypo_interface_clean
+      block:
+        - name: find all interfaces configuration files
+          find:
+            paths:
+              - '{{ kypo_interface_directory }}'
+          register: kypo_interface_extra_files
 
-   - name: remove multiple consecutive new line characters
-     replace:
-         path: '{{ item }}'
-         regexp: '(\n)+'
-         replace: '\n'
-     with_items: '{{ kypo_interface_config_files }}'
+        - set_fact:
+            kypo_interface_config_files: '{{ (kypo_interface_extra_files.files | map(attribute="path") | list) + [kypo_interface_default_file] }}'
 
-- name: configure interfaces
-  blockinfile:
-      path: '{{ kypo_interface_file }}'
-      create: yes
-      marker: '# {mark} {{ item.kypo_interface_device }}'
-      block: |
+        - include_tasks: 'clean-Debian.yml'
+          vars:
+            kypo_interface_device: '{{ kypo_interface_item.kypo_interface_device }}'
+          loop_control:
+            loop_var: kypo_interface_item
+          loop: '{{ kypo_interface_interfaces }}'
+
+        - name: remove multiple consecutive new line characters
+          replace:
+            path: '{{ item }}'
+            regexp: '(\n)+'
+            replace: '\n'
+          with_items: '{{ kypo_interface_config_files }}'
+
+    - name: configure interfaces
+      blockinfile:
+        path: '{{ kypo_interface_file }}'
+        create: yes
+        marker: '# {mark} {{ item.kypo_interface_device }}'
+        block: |
           allow-hotplug {{ item.kypo_interface_device }}
           auto {{ item.kypo_interface_device }}
           iface {{ item.kypo_interface_device }} inet dhcp
@@ -45,5 +65,5 @@
               pre-down ip route del {{ route['network'] }}/{{ route['mask'] }} via {{ route['gateway'] }}
               {% endfor %}
               {% endif %}
-  notify: kypo_interface_networking_restart
-  loop: '{{ kypo_interface_interfaces }}'
+      notify: kypo_interface_networking_restart
+      loop: '{{ kypo_interface_interfaces }}'
