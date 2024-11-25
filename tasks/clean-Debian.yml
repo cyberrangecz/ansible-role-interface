@@ -1,14 +1,13 @@
-
 - name: remove old iface settings for retrieved interface name
   replace:
-      path: '{{ item }}'
-      regexp: ^iface[ \t]{{ kypo_interface_device }}[ \t].*(\n[ \t]+.*)*
+    path: '{{ item }}'
+    regexp: ^iface[ \t]{{ kypo_interface_device }}[ \t].*(\n[ \t]+.*)*
   notify: kypo_interface_networking_restart
   with_items: '{{ kypo_interface_config_files }}'
 
 - name: remove the rest of old settings for retrieved interface name
   replace:
-      path: '{{ item }}'
-      regexp: '^.*(?<=\s){{ kypo_interface_device }}(?=\s).*$'
+    path: '{{ item }}'
+    regexp: '^.*(?<=\s){{ kypo_interface_device }}(?=\s).*$'
   notify: kypo_interface_networking_restart
   with_items: '{{ kypo_interface_config_files }}'
