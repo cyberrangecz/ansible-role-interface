@@ -1,13 +1,12 @@
-
 - name: check existence of required variables
   fail:
-      msg: required variable '{{ item.key }}' is undefined
+    msg: required variable '{{ item.key }}' is undefined
   when: item.value is undefined or not item.value
   with_dict: '{{ kypo_interface_required_variables }}'
 
 - name: check existence of required variables
   fail:
-      msg: kypo_interface_interfaces has an item with undefined kypo_interface_mac or kypo_interface_device
+    msg: kypo_interface_interfaces has an item with undefined kypo_interface_mac or kypo_interface_device
   when: |
     (kypo_interface_interfaces | rejectattr('kypo_interface_mac', 'defined') | length > 0) or
     (kypo_interface_interfaces | rejectattr('kypo_interface_device', 'defined') | length > 0)
