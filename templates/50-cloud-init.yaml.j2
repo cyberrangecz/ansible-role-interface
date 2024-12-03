@@ -1,0 +1,21 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+network:
+  version: 2
+  ethernets:
+    {% for interface in kypo_interface_interfaces %}
+    {{ interface.kypo_interface_device }}:
+      dhcp4: true
+      mtu: {{ kypo_interface_mtu }}
+      {% if interface.kypo_interface_default_gateway is defined and interface.kypo_interface_default_gateway %}
+      routes:
+        - to: 0.0.0.0/0
+          via: {{ interface.kypo_interface_default_gateway }}
+      {% endif %}
+      {% if interface.kypo_interface_routes is defined and interface.kypo_interface_routes %}
+      routes:
+        {% for route in interface.kypo_interface_routes %}
+        - to: {{ (route['network'] ~ '/' ~ route['mask']) | ipaddr('net') }}
+          via: {{ route['gateway'] }}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
