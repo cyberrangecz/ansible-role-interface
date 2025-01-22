@@ -3,7 +3,7 @@
 - name: Apply Netplan configuration
   command: netplan apply
 
-- name: kypo_interface_networking_restart
+- name: interface_networking_restart
   service:
     name: networking
     state: restarted

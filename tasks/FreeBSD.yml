@@ -2,22 +2,22 @@
 
 - name: clean interfaces configuration
   xml:
-    path: '{{ kypo_interface_opnsense_local_config_file }}'
-    xpath: '/opnsense/interfaces/*[if and if[text()="{{ item.kypo_interface_device }}"]]'
+    path: '{{ interface_opnsense_local_config_file }}'
+    xpath: '/opnsense/interfaces/*[if and if[text()="{{ item.interface_device }}"]]'
     state: absent
   delegate_to: localhost
-  loop: '{{ kypo_interface_interfaces }}'
-  when: kypo_interface_clean is defined and kypo_interface_clean
+  loop: '{{ interface_interfaces }}'
+  when: interface_clean is defined and interface_clean
 
 - name: get default gateway
   set_fact:
-    kypo_interface_default_gateway: '{{ kypo_interface_interfaces | selectattr("kypo_interface_default_gateway", "defined") | first }}'
+    interface_default_gateway: '{{ interface_interfaces | selectattr("interface_default_gateway", "defined") | first }}'
 
 - name: prepare variables with configuration
   set_fact:
     default_gateway:
-      interface: '{{ kypo_interface_default_gateway.kypo_interface_device }}'
-      gateway: '{{ kypo_interface_default_gateway.kypo_interface_default_gateway }}'
+      interface: '{{ interface_default_gateway.interface_device }}'
+      gateway: '{{ interface_default_gateway.interface_default_gateway }}'
       name: WAN
       ipprotocol: inet
       priority: 1
@@ -25,7 +25,7 @@
       monitor_disable: 1
     firewall_rule:
       type: pass
-      interface: '{{ kypo_interface_interfaces | map(attribute="kypo_interface_device") | join(",") }}'
+      interface: '{{ interface_interfaces | map(attribute="interface_device") | join(",") }}'
       ipprotocol: inet
       descr: Allow everything
       direction: any
@@ -37,7 +37,7 @@
 
 - name: configure gateway
   xml:
-    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    path: '{{ interface_opnsense_local_config_file }}'
     xpath: '/opnsense/gateways/gateway_item[name[text()="{{ default_gateway.name }}"]]/{{ item.key }}'
     pretty_print: yes
     value: '{{ item.value }}'
@@ -46,7 +46,7 @@
 
 - name: add firewall rule
   xml:
-    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    path: '{{ interface_opnsense_local_config_file }}'
     xpath: '/opnsense/filter/rule[descr[text()="{{ firewall_rule.descr }}"]]/{{ item.key }}'
     pretty_print: yes
     value: '{{ item.value }}'
@@ -71,7 +71,7 @@
 
 - name: set static addressing on allnetworks
   xml:
-    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    path: '{{ interface_opnsense_local_config_file }}'
     xpath: '/opnsense/interfaces/{{ item.0.if }}/{{ item.1.key }}'
     value: '{{ item.1.value }}'
     pretty_print: yes
@@ -80,8 +80,8 @@
 
 - name: copy the modified configuration to machine
   copy:
-    src: '{{ kypo_interface_opnsense_local_config_file }}'
-    dest: '{{ kypo_interface_opnsense_config_file }}'
+    src: '{{ interface_opnsense_local_config_file }}'
+    dest: '{{ interface_opnsense_config_file }}'
   register: configuration_copy
 
 - name: reboot

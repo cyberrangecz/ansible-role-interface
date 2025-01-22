@@ -2,20 +2,46 @@
 network:
   version: 2
   ethernets:
-    {% for interface in kypo_interface_interfaces %}
-    {{ interface.kypo_interface_device }}:
+    {% set ns = namespace(has_default_gateway=false) %}
+    {% for interface in interface_interfaces %}
+    {% if interface.interface_default_gateway is defined and interface.interface_default_gateway %}
+    {% set ns.has_default_gateway = true %}
+    {% endif %}
+    {% endfor %}
+    {% for interface in interface_interfaces | sort(attribute="interface_device") %}
+    {{ interface.interface_device }}:
       dhcp4: true
-      mtu: {{ kypo_interface_mtu }}
-      {% if interface.kypo_interface_default_gateway is defined and interface.kypo_interface_default_gateway %}
+      dhcp4-overrides:
+        route-metric: 100
+        use-dns: false
+        use-routes: false
+      mtu: {{ interface_mtu }}
+      {% if interface.interface_default_gateway is defined and interface.interface_default_gateway %}
       routes:
         - to: 0.0.0.0/0
-          via: {{ interface.kypo_interface_default_gateway }}
+          via: {{ interface.interface_default_gateway }}
       {% endif %}
-      {% if interface.kypo_interface_routes is defined and interface.kypo_interface_routes %}
+      {% if interface.interface_routes is defined and interface.interface_routes %}
       routes:
-        {% for route in interface.kypo_interface_routes %}
+        {% for route in interface.interface_routes %}
         - to: {{ (route['network'] ~ '/' ~ route['mask']) | ipaddr('net') }}
           via: {{ route['gateway'] }}
         {% endfor %}
+      {% endif %}
+      {% if not ns.has_default_gateway and loop.index0 == 0 %}
+      routes:
+        - to: 0.0.0.0/0
+          via: {{ ansible_default_ipv4.gateway }}
+      {% endif %}
+      {% if loop.index0 == 0 %}
+      nameservers:
+        addresses:
+          {% if ansible_dns.nameservers[0] == "127.0.0.53" and resolved_upstream_dns is defined and resolved_upstream_dns %}
+          - {{ resolved_upstream_dns[0] }}
+          {% elif ansible_dns.nameservers[0] == "127.0.0.53" %}
+          - 1.1.1.1
+          {% else %}
+          - {{ ansible_dns.nameservers[0] }}
+          {% endif %}
       {% endif %}
     {% endfor %}

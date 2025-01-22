@@ -1,6 +1,6 @@
 - name: stat OPNsense config file
   stat:
-    path: '{{ kypo_interface_opnsense_config_file }}'
+    path: '{{ interface_opnsense_config_file }}'
   register: opnsense_config_stat
 
 - name: check if config file exists
@@ -10,8 +10,8 @@
 
 - name: fetch config file
   fetch:
-    src: '{{ kypo_interface_opnsense_config_file }}'
-    dest: '{{ kypo_interface_opnsense_local_config_file }}'
+    src: '{{ interface_opnsense_config_file }}'
+    dest: '{{ interface_opnsense_local_config_file }}'
     flat: yes
 
 - name: install lxml on controller
@@ -22,7 +22,7 @@
 
 - name: check config file contains opnsense xml root
   xml:
-    path: '{{ kypo_interface_opnsense_local_config_file }}'
+    path: '{{ interface_opnsense_local_config_file }}'
     xpath: /opnsense
     content: attribute
   delegate_to: localhost
