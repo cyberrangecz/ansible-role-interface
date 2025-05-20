@@ -65,7 +65,7 @@
     interface_configs: |-
       [
       {%- for interface in interfaces -%}
-        { if: {{ interface }}, settings: [{key: if, value: {{ interface }}},{key: ipaddr,value: {{ ansible_facts[interface]['ipv4'][0]['address'] }}},{key: subnet,value: {{ ('127.0.0.1/' ~ ansible_facts[interface]['ipv4'][0]['netmask']) | ipaddr('prefix') }}},{key: mtu,value: 1442},{key: enable,value: 1}]},
+        { if: {{ interface }}, settings: [{key: if, value: {{ interface }}},{key: ipaddr,value: {{ ansible_facts[interface]['ipv4'][0]['address'] }}},{key: subnet,value: {{ ('127.0.0.1/' ~ ansible_facts[interface]['ipv4'][0]['netmask']) | ipaddr('prefix') }}},{key: mtu,value: {{ interface_mtu }}},{key: enable,value: 1}]},
       {%- endfor -%}
       ]
 
