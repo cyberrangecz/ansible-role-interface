@@ -20,6 +20,15 @@ network:
       routes:
         - to: 0.0.0.0/0
           via: {{ interface.interface_default_gateway }}
+      nameservers:
+        addresses:
+          {% if ansible_dns.nameservers[0] == "127.0.0.53" and resolved_upstream_dns is defined and resolved_upstream_dns %}
+          - {{ resolved_upstream_dns[0] }}
+          {% elif ansible_dns.nameservers[0] == "127.0.0.53" %}
+          - 1.1.1.1
+          {% else %}
+          - {{ ansible_dns.nameservers[0] }}
+          {% endif %}
       {% endif %}
       {% if interface.interface_routes is defined and interface.interface_routes %}
       routes:
@@ -32,8 +41,6 @@ network:
       routes:
         - to: 0.0.0.0/0
           via: {{ ansible_default_ipv4.gateway }}
-      {% endif %}
-      {% if loop.index0 == 0 %}
       nameservers:
         addresses:
           {% if ansible_dns.nameservers[0] == "127.0.0.53" and resolved_upstream_dns is defined and resolved_upstream_dns %}
