@@ -15,7 +15,6 @@ network:
         route-metric: 100
         use-dns: false
         use-routes: false
-      mtu: {{ interface_mtu }}
       {% if interface.interface_default_gateway is defined and interface.interface_default_gateway %}
       routes:
         - to: 0.0.0.0/0

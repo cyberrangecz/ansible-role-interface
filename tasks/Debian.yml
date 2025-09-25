@@ -54,7 +54,6 @@
           allow-hotplug {{ item.interface_device }}
           auto {{ item.interface_device }}
           iface {{ item.interface_device }} inet dhcp
-              mtu {{ interface_mtu }}
               {% if item.interface_default_gateway is defined and item.interface_default_gateway -%}
               gateway {{ item.interface_default_gateway }}
               up route add default gw {{ item.interface_default_gateway }}
