@@ -27,17 +27,4 @@ Mandatory parameters.
 Optional parameters.
 
 * `interface_clean` - Boolean value (**True**/**False**) that means whether to clean all interface configuration before applying role or not (default: True).
-* `interface_mtu` - The number of maximum transmission unit (default: 1442).
 * `interface_file_name` - The file name for your configuration located in `/etc/network/interfaces.d/` directory (by default the file `/etc/network/interface` is used).
-
-## Example
-
-Example of the simplest network interface configuration that just sets MTU of the specified interface.
-
-```yml
-roles:
-    - role: interface
-      interface_interfaces:
-          - interface_mac: 01:23:45:67:89:ab
-            interface_mtu: 1442
-```
