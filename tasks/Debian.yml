@@ -11,9 +11,6 @@
         dest: "{{ netplan_config_file }}"
       notify: Apply Netplan configuration
 
-    - name: Apply Netplan configuration
-      command: netplan apply
-
 - name: Use legacy configuration for older Debian
   when: not is_netplan
   block:
