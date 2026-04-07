@@ -7,7 +7,6 @@
     state: absent
   delegate_to: localhost
   loop: '{{ interface_interfaces }}'
-  when: interface_clean is defined and interface_clean
 
 - name: get default gateway
   set_fact:
