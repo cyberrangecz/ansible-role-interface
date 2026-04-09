@@ -18,6 +18,9 @@ Mandatory parameters.
 
 * `interface_interfaces` - The list of network interface parameters. Each interface may consists of following attributes.
     * `interface_mac` (mandatory) - The MAC address of interface to configure.
+    * `interface_ip`: (mandatory) - The IP address of interface to configure.
+    * `interface_net_prefix`: (mandatory) - The net prefix (e.g. 24) of interface to configure.
+    * `interface_device`: (mandatory) - The device (e.g. eth1) of interface to configure.
     * `interface_default_gateway` (optional) - The IPv4 address of default gateway.
     * `interface_routes` (optional) - The list of route parameters. Each route must consist of following attributes.
         * `gateway` (mandatory) - The IPv4 address of default gateway for this route.
@@ -26,7 +29,6 @@ Mandatory parameters.
 
 Optional parameters.
 
-* `interface_clean` - Boolean value (**True**/**False**) that means whether to clean all interface configuration before applying role or not (default: True).
 * `interface_mtu` - The number of maximum transmission unit (default: 1442).
 * `interface_file_name` - The file name for your configuration located in `/etc/network/interfaces.d/` directory (by default the file `/etc/network/interface` is used).
 

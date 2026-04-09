@@ -10,16 +10,15 @@ network:
     {% endfor %}
     {% for interface in interface_interfaces | sort(attribute="interface_device") %}
     {{ interface.interface_device }}:
-      dhcp4: true
-      dhcp4-overrides:
-        route-metric: 100
-        use-dns: false
-        use-routes: false
+      dhcp4: false
+      addresses:
+        - {{ interface.interface_ip }}/{{ '32' if interface.interface_default_gateway is defined and interface.interface_default_gateway else interface.interface_net_prefix }}
       mtu: {{ interface_mtu }}
       {% if interface.interface_default_gateway is defined and interface.interface_default_gateway %}
       routes:
         - to: 0.0.0.0/0
           via: {{ interface.interface_default_gateway }}
+          on-link: true
       nameservers:
         addresses:
           {% if ansible_dns.nameservers[0] == "127.0.0.53" and resolved_upstream_dns is defined and resolved_upstream_dns %}
